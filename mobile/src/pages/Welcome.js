@@ -4,24 +4,31 @@ import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'rea
 const { width, height } = Dimensions.get('window');
 
 export default class Welcome extends Component {
-  render() {
-    const { navigation } = this.props;
+  static navigationOptions = {
+    header: null,
+    title: 'Início'
+  };
 
+  render() {
     return (
       <View style={styles.container}>
         <Text style={styles.title}>Magic Library</Text>
         <Text style={styles.subtitle}>Adquira conhecimento</Text>
+
         <Image
-          source={require('../../assets/icon.png')}
+          source={require('../assets/magic_book.png')}
           resizeMode="contain"
           style={styles.image}
         />
-        <TouchableOpacity style={[styles.button, styles.buttonLogin]} onPress={() => navigation.navigate('Login')}>
-          <Text style={styles.buttonText}>Fazer Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.buttonRegister]} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.buttonText}>Realizar Cadastro</Text>
-        </TouchableOpacity>
+
+        <View style={styles.buttons}>
+          <TouchableOpacity style={[styles.button, styles.buttonLogin]} onPress={() => this.props.navigation.navigate('Login')}>
+            <Text style={styles.buttonText}>Fazer Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.buttonRegister]} onPress={() => this.props.navigation.navigate('Register')}>
+            <Text style={styles.buttonText}>Realizar Cadastro</Text>
+          </TouchableOpacity>
+        </View>
       </View >
     )
   }
@@ -36,14 +43,14 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    color: '#353061',
+    color: '#483b78',
     fontSize: 30,
     fontFamily: 'Roboto',
     fontWeight: 'bold'
   },
 
   subtitle: {
-    color: '#353061',
+    color: '#483b78',
     fontSize: 20,
     fontFamily: 'Roboto',
     marginTop: 2,
@@ -56,28 +63,33 @@ const styles = StyleSheet.create({
     height: height / 2
   },
 
+  buttons: {
+    width: '100%'
+  },
+
   button: {
     height: 50,
-    width: width * 0.81,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 4,
+    marginHorizontal: 25
   },
 
   buttonLogin: {
-    backgroundColor: '#353061',
+    backgroundColor: '#483b78',
     marginTop: 20
   },
 
   buttonRegister: {
-    backgroundColor: '#9B91B1',
+    backgroundColor: '#7665b3',
     marginTop: 8
   },
 
   buttonText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: 'bold'
+    fontSize: 16,
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
   }
 
 });
