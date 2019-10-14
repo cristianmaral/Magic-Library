@@ -167,7 +167,8 @@ const styles = StyleSheet.create({
     height: 45,
     width: '82.5%',
     borderTopLeftRadius: 4,
-    borderBottomLeftRadius: 4
+    borderBottomLeftRadius: 4,
+    borderColor: '#483b78'
   },
 
   searchIcon: {

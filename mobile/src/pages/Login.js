@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, AsyncStorage, Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header } from 'react-navigation-stack';
+
+import api from '../services/api';
 
 export default class Login extends Component {
   constructor(props) {
@@ -18,10 +20,31 @@ export default class Login extends Component {
     headerTintColor: '#483b78'
   };
 
+  handleLogin = async () => {
+    try {
+      const response = await api.post('/users/login', {
+        email: this.state.email,
+        password: this.state.password
+      });
+      const { _id } = response.data;
+      await AsyncStorage.setItem('user', _id);
+      this.props.navigation.navigate('BookList');
+    } catch (error) {
+      Alert.alert(
+        'Falha na autenticação',
+        error.response.data.error,
+        [
+          { text: 'OK' }
+        ]
+      );
+      this.setState({ email: '', password: '', hidePassword: true });
+    }
+  };
+
   render() {
     return (
       <KeyboardAvoidingView enabled={true} behavior='padding' keyboardVerticalOffset={Header.HEIGHT + 20} style={styles.container}>
-        <Image source={require('../assets/logo.png')} style={styles.logo}/>
+        <Image source={require('../assets/logo.png')} style={styles.logo} />
         <View style={styles.form}>
           <Text style={styles.label}>E-MAIL</Text>
           <TextInput
@@ -32,7 +55,7 @@ export default class Login extends Component {
             placeholderTextColor='#999'
             style={styles.input}
             value={this.state.email}
-            onChangeText={(email) => {this.setState({email: email})}}
+            onChangeText={(email) => { this.setState({ email: email }) }}
           />
 
           <Text style={styles.label}>SENHA</Text>
@@ -44,15 +67,15 @@ export default class Login extends Component {
             secureTextEntry={this.state.hidePassword}
             style={styles.input}
             value={this.state.password}
-            onChangeText={(password) => {this.setState({password: password})}}
+            onChangeText={(password) => { this.setState({ password: password }) }}
           />
           <Icon style={styles.visibilityToggleButton}
             color={'#999'}
-            onPress={() => {this.setState({hidePassword: !this.state.hidePassword})}}
+            onPress={() => { this.setState({ hidePassword: !this.state.hidePassword }) }}
             name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
             size={25}
           />
-          <TouchableOpacity style={styles.loginButton}>
+          <TouchableOpacity style={styles.loginButton} onPress={this.handleLogin}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
 

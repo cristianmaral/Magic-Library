@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import { CheckBox, Image, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {AsyncStorage, Alert, CheckBox, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header } from 'react-navigation-stack';
+
+import api from '../services/api';
 
 export default class Register extends Component {
   constructor(props) {
@@ -48,6 +50,30 @@ export default class Register extends Component {
     }
     this.setState({ formErrors, [inputName]: value });
   }
+
+  handleRegister = async () => {
+    if (!this.state.formErrors.name && !this.state.formErrors.email && !this.state.formErrors.password && !this.state.formErrors.confirmPassword) {
+      try {
+        const response = await api.post('/users/register', {
+          name: this.state.name,
+          email: this.state.email,
+          password: this.state.password,
+          receiveNotifications: this.state.receiveNotifications
+        });
+        const { _id } = response.data;
+        await AsyncStorage.setItem('user', _id);
+        this.props.navigation.navigate('BookList');
+      } catch (error) {
+        Alert.alert(
+          'Falha no cadastro',
+          error.response.data.error,
+          [
+            { text: 'OK' }
+          ]
+        );
+      }
+    }
+  };
 
   render() {
     return (
@@ -137,7 +163,7 @@ export default class Register extends Component {
             <Text style={styles.checkBoxText}>Desejo receber notificações de lançamentos</Text>
           </View>
 
-          <TouchableOpacity style={styles.registerButton}>
+          <TouchableOpacity style={styles.registerButton} onPress={this.handleRegister}>
             <Text style={styles.registerText}>Cadastrar</Text>
           </TouchableOpacity>
         </ScrollView>
