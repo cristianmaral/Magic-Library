@@ -77,13 +77,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: 83,
     resizeMode: 'contain',
-    marginBottom: 10
+    marginBottom: 20
   },
 
   form: {
     width: '100%',
-    paddingHorizontal: 25,
-    marginTop: 25,
+    paddingHorizontal: 25
   },
 
   label: {

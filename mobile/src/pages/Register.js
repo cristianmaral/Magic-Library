@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { CheckBox, Image, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { CheckBox, Image, KeyboardAvoidingView, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header } from 'react-navigation-stack';
 
@@ -13,7 +13,13 @@ export default class Register extends Component {
       confirmPassword: '',
       hidePassword: true,
       hideConfirmPassword: true,
-      receiveNotifications: false
+      receiveNotifications: false,
+      formErrors: {
+        name: false,
+        email: false,
+        password: false,
+        confirmPassword: false
+      }
     };
   }
 
@@ -22,21 +28,45 @@ export default class Register extends Component {
     headerTintColor: '#483b78'
   };
 
+  handleInputChange = (inputName, value) => {
+    const { formErrors } = this.state;
+    switch (inputName) {
+      case 'name':
+        nameRegex = /^(([A-Za-z]+[\-\']?)*([A-Za-z]+)?\s)+([A-Za-z]+[\-\']?)*([A-Za-z]+)+$/;
+        formErrors.name = nameRegex.test(value) ? false : true;
+        break;
+      case 'email':
+        emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        formErrors.email = emailRegex.test(value.toLowerCase()) ? false : true;
+        break;
+      case 'password':
+        formErrors.password = value.length >= 6 ? false : true;
+        break;
+      case 'confirmPassword':
+        formErrors.confirmPassword = value == this.state.password ? false : true;
+        break;
+    }
+    this.setState({ formErrors, [inputName]: value });
+  }
+
   render() {
     return (
-      <KeyboardAvoidingView enabled={true} behavior='padding' keyboardVerticalOffset={Header.HEIGHT + 20} style={styles.container}>
+      <KeyboardAvoidingView enabled={true} behavior='padding' keyboardVerticalOffset={Header.HEIGHT + 28} style={styles.container}>
         <Image source={require('../assets/logo.png')} style={styles.logo} />
-        <View style={styles.form}>
-          <Text style={styles.label}>NOME COMPLETO*</Text>
+        <ScrollView style={styles.form}>
+          <Text style={styles.label}>NOME COMPLETO *</Text>
           <TextInput
             autoCapitalize='words'
             autoCorrect={false}
             placeholder='Seu nome completo'
             placeholderTextColor='#999'
-            style={styles.input}
+            style={[styles.input, !this.state.formErrors.name ? styles.validInput : styles.errorInput]}
             value={this.state.name}
-            onChangeText={(name) => {this.setState({name: name})}}
+            onChangeText={(value) => { this.handleInputChange('name', value) }}
           />
+          {this.state.formErrors.name && this.state.name.length > 0 && (
+            <Text style={styles.errorMessage}>Nome completo inválido</Text>
+          )}
 
           <Text style={styles.label}>E-MAIL *</Text>
           <TextInput
@@ -45,46 +75,59 @@ export default class Register extends Component {
             keyboardType='email-address'
             placeholder='Seu e-mail'
             placeholderTextColor='#999'
-            style={styles.input}
+            style={[styles.input, !this.state.formErrors.email ? styles.validInput : styles.errorInput]}
             value={this.state.email}
-            onChangeText={(email) => {this.setState({email: email})}}
+            onChangeText={(value) => { this.handleInputChange('email', value) }}
           />
+          {this.state.formErrors.email && this.state.email.length > 0 && (
+            <Text style={styles.errorMessage}>E-mail inválido</Text>
+          )}
 
-          <Text style={styles.label}>SENHA *</Text>
-          <TextInput
-            autoCapitalize='none'
-            autoCorrect={false}
-            placeholder='Sua senha'
-            placeholderTextColor='#999'
-            secureTextEntry={this.state.hidePassword}
-            style={styles.input}
-            value={this.state.password}
-            onChangeText={(password) => {this.setState({password: password})}}
-          />
-          <Icon style={[styles.visibilityToggleButton, styles.passwordToggleButton]}
-            color={'#999'}
-            onPress={() => {this.setState({hidePassword: !this.state.hidePassword})}}
-            name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
-            size={25}
-          />
+          <View>
+            <Text style={styles.label}>SENHA *</Text>
+            <TextInput
+              autoCapitalize='none'
+              autoCorrect={false}
+              placeholder='Sua senha'
+              placeholderTextColor='#999'
+              secureTextEntry={this.state.hidePassword}
+              style={[styles.input, !this.state.formErrors.password ? styles.validInput : styles.errorInput]}
+              value={this.state.password}
+              onChangeText={(value) => { this.handleInputChange('password', value) }}
+            />
+            <Icon style={styles.visibilityToggleButton}
+              color={'#999'}
+              onPress={() => { this.setState({ hidePassword: !this.state.hidePassword }) }}
+              name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
+              size={25}
+            />
+            {this.state.formErrors.password && this.state.password.length > 0 && (
+              <Text style={styles.errorMessage}>Senha inválida (mínimo de 6 caracteres)</Text>
+            )}
+          </View>
 
-          <Text style={styles.label}>CONFIRMAR SENHA *</Text>
-          <TextInput
-            autoCapitalize='none'
-            autoCorrect={false}
-            placeholder='Confirme sua senha'
-            placeholderTextColor='#999'
-            secureTextEntry={this.state.hideConfirmPassword}
-            style={styles.input}
-            value={this.state.confirmPassword}
-            onChangeText={(confirmPassword) => {this.setState({confirmPassword: confirmPassword})}}
-          />
-          <Icon style={[styles.visibilityToggleButton, styles.confirmPasswordToggleButton]}
-            color={'#999'}
-            onPress={() => {this.setState({hideConfirmPassword: !this.state.hideConfirmPassword})}}
-            name={this.state.hideConfirmPassword ? 'visibility' : 'visibility-off'}
-            size={25}
-          />
+          <View>
+            <Text style={styles.label}>CONFIRMAR SENHA *</Text>
+            <TextInput
+              autoCapitalize='none'
+              autoCorrect={false}
+              placeholder='Confirme sua senha'
+              placeholderTextColor='#999'
+              secureTextEntry={this.state.hideConfirmPassword}
+              style={[styles.input, !this.state.formErrors.confirmPassword ? styles.validInput : styles.errorInput]}
+              value={this.state.confirmPassword}
+              onChangeText={(value) => { this.handleInputChange('confirmPassword', value) }}
+            />
+            <Icon style={styles.visibilityToggleButton}
+              color={'#999'}
+              onPress={() => { this.setState({ hideConfirmPassword: !this.state.hideConfirmPassword }) }}
+              name={this.state.hideConfirmPassword ? 'visibility' : 'visibility-off'}
+              size={25}
+            />
+            {this.state.formErrors.confirmPassword && this.state.confirmPassword.length > 0 && (
+              <Text style={styles.errorMessage}>As senhas não conferem</Text>
+            )}
+          </View>
 
           <View style={styles.notificationCheckBox}>
             <CheckBox
@@ -95,9 +138,9 @@ export default class Register extends Component {
           </View>
 
           <TouchableOpacity style={styles.registerButton}>
-            <Text style={styles.loginText}>Cadastrar</Text>
+            <Text style={styles.registerText}>Cadastrar</Text>
           </TouchableOpacity>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     )
   }
@@ -108,20 +151,20 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
 
   logo: {
     width: 200,
     height: 83,
     resizeMode: 'contain',
-    marginBottom: 10
+    marginBottom: 20,
+    marginTop: 30
   },
 
   form: {
     width: '100%',
-    paddingHorizontal: 25,
-    marginTop: 25,
+    paddingHorizontal: 25
   },
 
   label: {
@@ -132,7 +175,6 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    borderColor: '#999',
     paddingHorizontal: 10,
     fontSize: 16,
     color: '#444',
@@ -141,21 +183,28 @@ const styles = StyleSheet.create({
     borderRadius: 4
   },
 
+  validInput: {
+    borderColor: '#999'
+  },
+
+  errorInput: {
+    borderColor: '#FF0000'
+  },
+
+  errorMessage: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginTop: -12,
+    marginBottom: 10
+  },
+
   visibilityToggleButton:
   {
     position: 'absolute',
     right: 0,
-    marginRight: 24,
+    top: 40,
     paddingHorizontal: 10,
     zIndex: 1
-  },
-
-  passwordToggleButton: {
-    top: 224
-  },
-
-  confirmPasswordToggleButton: {
-    top: 317
   },
 
   registerButton: {
@@ -163,29 +212,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#483b78',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 4
+    borderRadius: 4,
+    marginBottom: 20
   },
 
-  loginText: {
+  registerText: {
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
     textTransform: 'uppercase'
   },
 
-  forgotPasswordButton: {
-    marginTop: 15
-  },
-
-  forgotPasswordText: {
-    color: '#999',
-    textAlign: 'center',
-    textDecorationLine: 'underline'
-  },
-
   notificationCheckBox: {
     flexDirection: 'row',
-    marginLeft: -8,
+    marginLeft: -7.1,
     marginBottom: 15
   },
 
