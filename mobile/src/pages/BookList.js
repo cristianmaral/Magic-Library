@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    marginTop: 35
+    marginTop: 40
   },
 
   header: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   userIcon: {
     color: '#483b78',
     position: 'absolute',
-    right: 15,
+    right: 20,
     top: 10
   },
 
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
 
   search: {
     width: '100%',
-    marginLeft: 15,
+    marginLeft: 20,
     backgroundColor: '#fff',
     flexDirection: 'row',
     marginBottom: 10
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#444',
     height: 45,
-    width: '82.5%',
+    width: '80%',
     borderTopLeftRadius: 4,
     borderBottomLeftRadius: 4,
     borderColor: '#483b78'
@@ -182,16 +182,16 @@ const styles = StyleSheet.create({
   categoryName: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 15
+    marginLeft: 20
   },
 
   list: {
-    paddingLeft: 15,
+    paddingLeft: 20,
     marginVertical: 10
   },
 
   listItem: {
-    marginRight: 15,
+    marginRight: 20,
     borderColor: '#483b78',
     borderWidth: 2,
     borderRadius: 4,
@@ -203,8 +203,8 @@ const styles = StyleSheet.create({
   },
 
   thumbnail: {
-    width: 110,
-    height: 130,
+    width: 106,
+    height: 150,
     resizeMode: 'stretch',
     borderRadius: 2
   },

@@ -21,23 +21,29 @@ export default class Login extends Component {
   };
 
   handleLogin = async () => {
-    try {
-      const response = await api.post('/users/login', {
-        email: this.state.email,
-        password: this.state.password
-      });
-      const { _id } = response.data;
-      await AsyncStorage.setItem('user', _id);
-      this.props.navigation.navigate('BookList');
-    } catch (error) {
-      Alert.alert(
-        'Falha na autenticação',
-        error.response.data.error,
-        [
-          { text: 'OK' }
-        ]
-      );
-      this.setState({ email: '', password: '', hidePassword: true });
+    if (this.state.email != '' && this.state.password != '') {
+      try {
+        const response = await api.post('/users/login', {
+          email: this.state.email,
+          password: this.state.password
+        });
+        const { _id, admin } = response.data;
+        await AsyncStorage.setItem('user', _id);
+        if (admin) {
+          this.props.navigation.navigate('Admin');
+        }
+        else {
+          this.props.navigation.navigate('BookList');
+        }
+      } catch (error) {
+        Alert.alert(
+          'Falha na autenticação',
+          error.response.data.error,
+          [
+            { text: 'OK' }
+          ]
+        );
+      }
     }
   };
 
