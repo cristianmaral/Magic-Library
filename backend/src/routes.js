@@ -14,6 +14,7 @@ routes.post('/users/register', UserController.store);
 
 //Routes referentes aos livros
 routes.get('/books', BookController.index);
-routes.post('/books', upload.single('image'), BookController.store);
+var uploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }])
+routes.post('/books', uploadFields, BookController.store);
 
 module.exports = routes;

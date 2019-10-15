@@ -1,3 +1,5 @@
+const bcrypt = require('bcrypt');
+
 const User = require('../models/User');
 
 module.exports = {
@@ -8,7 +10,7 @@ module.exports = {
     if (!user) {
       return res.status(400).json({ error: 'E-mail não cadastrado' });
     }
-    else if (user.password != password) {
+    else if (!bcrypt.compareSync(password, user.password)) {
       return res.status(400).json({ error: 'Senha incorreta' });
     }
     else {
@@ -24,7 +26,13 @@ module.exports = {
       return res.status(400).json({ error: 'E-mail já cadastrado' });
     }
     else {
-      user = await User.create({ name, email, password, receiveNotifications });
+      user = await User.create({
+        admin: false,
+        email,
+        name,
+        password: bcrypt.hashSync(password, 10),
+        receiveNotifications
+      });
       return res.json(user);
     }
   }

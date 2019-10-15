@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
-  name: String,
+  admin: Boolean,
   email: String,
+  name: String,
   password: String,
-  receiveNotifications: Boolean,
-  admin: Boolean
+  receiveNotifications: Boolean
 });
 
 module.exports = mongoose.model('User', UserSchema);

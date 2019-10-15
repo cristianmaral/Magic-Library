@@ -1,5 +1,5 @@
-const User = require('../models/User');
 const Book = require('../models/Book');
+const User = require('../models/User');
 
 module.exports = {
   async index(req, res) {
@@ -16,7 +16,8 @@ module.exports = {
 
   async store(req, res) {
     const { title, authors, edition, volume, category } = req.body;
-    const { filename } = req.file;
+    const image = req.files.image[0].filename;
+    const pdf = req.files.pdf[0].filename;
     const { user_id } = req.headers;
     const user = await User.findById(user_id);
 
@@ -28,13 +29,14 @@ module.exports = {
     }
     else {
       const book = await Book.create({
-        image: filename,
-        title,
         authors: authors.split(',').map(author => author.trim()),
+        category,
         edition,
-        volume,
-        category
-      })
+        image,
+        pdf,
+        title,
+        volume
+      });
       return res.json(book);
     }
   }

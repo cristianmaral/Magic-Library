@@ -19,6 +19,7 @@ const BookSchema = new mongoose.Schema({
   },
   edition: Number,
   image: String,
+  pdf: String,
   title: String,
   volume: Number
 }, {
@@ -26,7 +27,11 @@ const BookSchema = new mongoose.Schema({
 });
 
 BookSchema.virtual('image_url').get(function () {
-  return `http://localhost:3333/images/${this.image}`
-})
+  return `http://localhost:3333/files/images/${this.image}`
+});
+
+BookSchema.virtual('pdf_url').get(function () {
+  return `http://localhost:3333/files/pdfs/${this.pdf}`
+});
 
 module.exports = mongoose.model('Book', BookSchema);
