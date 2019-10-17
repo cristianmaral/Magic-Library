@@ -28,7 +28,7 @@ export default class Login extends Component {
           password: this.state.password
         });
         const { _id, admin } = response.data;
-        await AsyncStorage.setItem('user', _id);
+        await AsyncStorage.setItem('user', JSON.stringify({ id: _id, admin }));
         if (admin) {
           this.props.navigation.navigate('Admin');
         }

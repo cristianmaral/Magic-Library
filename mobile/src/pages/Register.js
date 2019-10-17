@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {AsyncStorage, Alert, CheckBox, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AsyncStorage, Alert, CheckBox, Image, KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Header } from 'react-navigation-stack';
 
@@ -60,8 +60,8 @@ export default class Register extends Component {
           password: this.state.password,
           receiveNotifications: this.state.receiveNotifications
         });
-        const { _id } = response.data;
-        await AsyncStorage.setItem('user', _id);
+        const { _id, admin } = response.data;
+        await AsyncStorage.setItem('user', JSON.stringify({ id: _id, admin }));
         this.props.navigation.navigate('BookList');
       } catch (error) {
         Alert.alert(

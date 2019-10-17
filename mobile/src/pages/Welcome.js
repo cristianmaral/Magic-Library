@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { AsyncStorage, Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
 export default class Welcome extends Component {
+  constructor(props) {
+    super(props);
+  }
   static navigationOptions = {
     header: null,
     title: 'Início'

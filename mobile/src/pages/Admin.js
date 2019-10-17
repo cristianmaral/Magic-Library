@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { AsyncStorage, Alert, Image, KeyboardAvoidingView, Picker, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Header } from 'react-navigation-stack';
-import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 
 import api from '../services/api';
 
@@ -24,25 +24,36 @@ export default class pages extends Component {
     header: null
   };
 
-  logOut = async () => {
+  handleLogout = async () => {
     await AsyncStorage.clear();
     this.props.navigation.navigate('Welcome');
   };
 
   handleInputChange = (inputName, value) => {
     this.setState({ [inputName]: value });
-  }
+  };
 
-  selectImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: false
+  handleSelectImage = async () => {
+    let image = await DocumentPicker.getDocumentAsync({
+      type: 'image/jpeg',
+      copyToCacheDirectory: false
     });
 
-    if (!result.cancelled) {
-      this.handleInputChange('image', result.uri);
+    if (image.type == 'success') {
+      this.handleInputChange('image', { uri: image.uri, type: 'image/jpeg', name: image.name });
     }
-  }
+  };
+
+  handleSelectPdf = async () => {
+    let pdf = await DocumentPicker.getDocumentAsync({
+      type: 'application/pdf',
+      copyToCacheDirectory: false
+    });
+
+    if (pdf.type == 'success') {
+      this.handleInputChange('pdf', { uri: pdf.uri, type: 'application/pdf', name: pdf.name });
+    }
+  };
 
   handleRegisterBook = async () => {
     try {
@@ -52,11 +63,12 @@ export default class pages extends Component {
       formData.append('category', this.state.category);
       formData.append('edition', this.state.edition);
       formData.append('volume', this.state.volume);
-      formData.append('image', { uri: this.state.image, type: 'image/jpeg', name: 'livro.jpg' })
+      formData.append('image', this.state.image);
+      formData.append('pdf', this.state.pdf);
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'user_id': await AsyncStorage.getItem('user')
+          'user_id': await AsyncStorage.getItem('user').user_id
         }
       };
       const response = await api.post('/books', formData, config);
@@ -80,7 +92,7 @@ export default class pages extends Component {
 
   render() {
     return (
-      <KeyboardAvoidingView enabled={true} behavior='padding' keyboardVerticalOffset={Header.HEIGHT + 28} style={styles.container}>
+      <KeyboardAvoidingView enabled={true} behavior='padding' keyboardVerticalOffset={5} style={styles.container}>
         <View style={styles.header}>
           <Image source={require('../assets/logo.png')} style={styles.logo} />
           <Icon
@@ -88,16 +100,27 @@ export default class pages extends Component {
             color={'#483b78'}
             name={'user-circle'}
             size={40}
-            onPress={this.logOut}
+            onPress={this.handleLogout}
           />
         </View>
         <ScrollView style={styles.form}>
           <Text style={styles.label}>IMAGEM *</Text>
-          <TouchableOpacity style={styles.imageButton} onPress={this.selectImage}>
-            <Image
-              style={[styles.image, this.state.image ? styles.hasImage : styles.noImage]}
-              source={this.state.image ? { uri: this.state.image } : require('../assets/camera.png')}
-            />
+          <TouchableOpacity style={styles.imageButton} onPress={this.handleSelectImage}>
+            {this.state.image && (
+              <Image
+                style={styles.image}
+                source={{ uri: this.state.image.uri }}
+              />
+            )}
+            {!this.state.image && (
+              <Icon
+                style={styles.cameraIcon}
+                color={'#483b78'}
+                name={'camera'}
+                size={70}
+              />
+            )
+            }
           </TouchableOpacity>
 
           <Text style={styles.label}>TÍTULO *</Text>
@@ -167,6 +190,18 @@ export default class pages extends Component {
             </View>
           </View>
 
+          <Text style={styles.label}>PDF *</Text>
+          <View style={[styles.input, styles.validInput, styles.inputRow]}>
+            <View style={styles.pdfButtonInput}>
+              <TouchableOpacity style={styles.pdfButton} onPress={this.handleSelectPdf}>
+                <Text style={styles.pdfButtonText}>Escolher PDF</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.pdfTextInput}>
+              <Text style={styles.pdfText}>{this.state.pdf ? 'PDF inserido com sucesso' : 'Nenhum arquivo selecionado'}</Text>
+            </View>
+          </View>
+
           <TouchableOpacity style={styles.registerBookButton} onPress={this.handleRegisterBook}>
             <Text style={styles.registerBookText}>Cadastrar Livro</Text>
           </TouchableOpacity>
@@ -220,20 +255,19 @@ const styles = StyleSheet.create({
     width: 106,
     height: 150,
     borderRadius: 2,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
 
   image: {
     width: '100%',
-    height: '100%'
-  },
-
-  hasImage: {
+    height: '100%',
     resizeMode: 'stretch'
   },
 
-  noImage: {
-    resizeMode: 'center'
+  cameraIcon: {
+    alignSelf: 'center'
   },
 
   input: {
@@ -277,6 +311,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: -12,
     marginBottom: 10
+  },
+
+  pdfInput: {
+    alignContent: 'center',
+    justifyContent: 'center',
+    width: '100%'
+  },
+
+  pdfButtonInput: {
+    width: '40%',
+    justifyContent: 'center',
+    alignContent: 'center'
+  },
+
+  pdfButton: {
+    width: '100%',
+    height: 30,
+    backgroundColor: '#483b78',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4
+  },
+
+  pdfButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    textTransform: 'uppercase'
+  },
+
+  pdfTextInput: {
+    width: '57%',
+    justifyContent: 'center',
+    alignContent: 'center'
+  },
+
+  pdfText: {
+    fontSize: 15
   },
 
   registerBookButton: {
