@@ -1,5 +1,10 @@
+const fs = require('fs');
+const path = require('path');
+const pdfParse = require('pdf-parse');
+
 const Book = require('../models/Book');
 const User = require('../models/User');
+const tfidf = require('../modules/tfidf');
 
 module.exports = {
   async index(req, res) {
@@ -39,5 +44,23 @@ module.exports = {
       });
       return res.json(book);
     }
+  },
+
+  teste(req, res) {
+    var text1 = 'andre bruno cristian andre cristian joaquim joaquim joaquim piranha';
+    var text2 = 'bola gato tutorial safada piranha cristian andre brunequim bruno';
+    var text3 = 'andre bruno brunequim tutorial parceria';
+    var corpus = [];
+
+    corpus[0] = text1;
+    corpus[1] = text2;
+    corpus[2] = text3;
+
+    console.log(tfidf.calculateTF(text1));
+    console.log(tfidf.calculateTF(text2));
+
+    console.log(tfidf.calculateIDF(corpus));
+
+    return res.json({ corpus });
   }
 };
