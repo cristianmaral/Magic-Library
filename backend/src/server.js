@@ -10,6 +10,7 @@ const app = express();
 mongoose.connect('mongodb+srv://admin:admin@cluster0-uqnij.mongodb.net/magic_library?retryWrites=true&w=majority', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  useFindAndModify: false
 }); //Conectando com o MongoDB Atlas
 
 app.use(cors());

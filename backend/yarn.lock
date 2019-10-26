@@ -1707,6 +1707,11 @@ registry-url@^3.0.3:
   dependencies:
     rc "^1.0.1"
 
+remove-accents@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/remove-accents/-/remove-accents-0.4.2.tgz#0a43d3aaae1e80db919e07ae254b285d9e1c7bb5"
+  integrity sha1-CkPTqq4egNuRngeuJUsoXZ4ce7U=
+
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
@@ -1937,6 +1942,11 @@ static-extend@^0.1.1:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
+
+stopword@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/stopword/-/stopword-0.3.3.tgz#f3add0d73db17d42a5826bed00c38c9c89fc1466"
+  integrity sha512-ZhAwWE+A886IS4c0j82z5BrK7MBiE7VDUCmBLBViGPpaLp+r++zI8atlYcgK1I65hCjsZUA9GixT/w+isG3z2A==
 
 streamsearch@0.1.2:
   version "0.1.2"

@@ -3,8 +3,10 @@ const path = require('path');
 const pdfParse = require('pdf-parse');
 
 const Book = require('../models/Book');
+const Term = require('../models/Term');
 const User = require('../models/User');
-const tfidf = require('../modules/tfidf');
+const tfidf = require('../utils/tfidf');
+const preprocessing = require('../utils/preprocessing');
 
 module.exports = {
   async index(req, res) {
@@ -19,6 +21,20 @@ module.exports = {
     }
   },
 
+  async show(req, res) {
+    const { book_id } = req.params;
+
+    if (book_id.length != 24) {
+      return res.status(400).json({ error: 'Identificador inválido' });
+    }
+    const book = await Book.findById(book_id);
+
+    if (!book) {
+      return res.status(400).json({ error: 'Livro não existente' });
+    }
+    return res.json(book);
+  },
+
   async store(req, res) {
     const { title, authors, edition, volume, category } = req.body;
     const image = req.files.image[0].filename;
@@ -29,38 +45,37 @@ module.exports = {
     if (!user) {
       return res.status(400).json({ error: 'Usuário não existente' });
     }
-    else if (user.admin == false) {
+    if (user.admin == false) {
       return res.status(400).json({ error: 'Permissões insuficientes para cadastrar livros' });
     }
-    else {
-      const book = await Book.create({
-        authors: authors.split(',').map(author => author.trim()),
-        category,
-        edition,
-        image,
-        pdf,
-        title,
-        volume
-      });
-      return res.json(book);
-    }
+
+    // pdfFile = fs.readFileSync(path.resolve(__dirname, '..', '..', 'uploads', 'pdfs', pdf));
+    // pdfText = await pdfParse(pdfFile);
+    // pdfText = preprocessing.runCompletePreprocessing(pdfText.text);
+    // terms = await Term.find({});
+
+
+    const book = await Book.create({
+      authors: authors.split(',').map(author => author.trim()),
+      category,
+      edition,
+      image,
+      pdf,
+      title,
+      volume
+    });
+    return res.json(book);
   },
 
-  teste(req, res) {
+  async teste(req, res) {
     var text1 = 'andre bruno cristian andre cristian joaquim joaquim joaquim piranha';
     var text2 = 'bola gato tutorial safada piranha cristian andre brunequim bruno';
     var text3 = 'andre bruno brunequim tutorial parceria';
-    var corpus = [];
 
-    corpus[0] = text1;
-    corpus[1] = text2;
-    corpus[2] = text3;
-
-    console.log(tfidf.calculateTF(text1));
-    console.log(tfidf.calculateTF(text2));
-
-    console.log(tfidf.calculateIDF(corpus));
-
-    return res.json({ corpus });
+    await tfidf.calculateTFIDF('teste', text1, 1);
+    await tfidf.calculateTFIDF('teste2', text2, 2);
+    await tfidf.calculateTFIDF('teste3', text3, 3);
+    const quantidade = await Term.countDocuments();
+    return res.json({ quantidade:  quantidade});
   }
 };
