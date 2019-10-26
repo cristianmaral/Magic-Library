@@ -1,8 +1,9 @@
 const Term = require('../models/Term');
 
 module.exports = {
-  async calculateTFIDF(documentId, documentText, N) {
+  async calculateTFIDF(documentId, documentText, documentsCount) {
     documentText = documentText.split(/\s+/);
+    documentText = documentText.filter(term => term !== '');
     documentTF = {};
 
     //Contando a ocorrência de cada termo do documento
@@ -32,7 +33,7 @@ module.exports = {
     //Atualizando o IDF de todos os termos do banco de dados
     allTerms = await Term.find({}); //Buscando todos os termos
     for (i = 0; i < allTerms.length; i++) {
-      await Term.findByIdAndUpdate(allTerms[i]._id, { idf: 1 + Math.log(N / (1 + allTerms[i].tf.length)) }, { new: true });
+      await Term.findByIdAndUpdate(allTerms[i]._id, { idf: 1 + Math.log(documentsCount / (1 + allTerms[i].tf.length)) }, { new: true });
     }
   }
 };

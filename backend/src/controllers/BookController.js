@@ -3,7 +3,6 @@ const path = require('path');
 const pdfParse = require('pdf-parse');
 
 const Book = require('../models/Book');
-const Term = require('../models/Term');
 const User = require('../models/User');
 const tfidf = require('../utils/tfidf');
 const preprocessing = require('../utils/preprocessing');
@@ -48,13 +47,6 @@ module.exports = {
     if (user.admin == false) {
       return res.status(400).json({ error: 'Permissões insuficientes para cadastrar livros' });
     }
-
-    // pdfFile = fs.readFileSync(path.resolve(__dirname, '..', '..', 'uploads', 'pdfs', pdf));
-    // pdfText = await pdfParse(pdfFile);
-    // pdfText = preprocessing.runCompletePreprocessing(pdfText.text);
-    // terms = await Term.find({});
-
-
     const book = await Book.create({
       authors: authors.split(',').map(author => author.trim()),
       category,
@@ -64,6 +56,11 @@ module.exports = {
       title,
       volume
     });
+    const pdfFile = fs.readFileSync(path.resolve(__dirname, '..', '..', 'uploads', 'pdfs', book.pdf));
+    pdfText = await pdfParse(pdfFile);
+    pdfText = preprocessing.runCompletePreprocessing(pdfText.text);
+    const documentsCount = await Book.countDocuments();
+    await tfidf.calculateTFIDF(book._id, pdfText, documentsCount);
     return res.json(book);
   },
 
@@ -76,6 +73,6 @@ module.exports = {
     await tfidf.calculateTFIDF('teste2', text2, 2);
     await tfidf.calculateTFIDF('teste3', text3, 3);
     const quantidade = await Term.countDocuments();
-    return res.json({ quantidade:  quantidade});
+    return res.json({ quantidade: quantidade });
   }
 };
