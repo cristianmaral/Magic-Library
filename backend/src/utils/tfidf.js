@@ -35,5 +35,33 @@ module.exports = {
     for (i = 0; i < allTerms.length; i++) {
       await Term.findByIdAndUpdate(allTerms[i]._id, { idf: 1 + Math.log(documentsCount / (1 + allTerms[i].tf.length)) }, { new: true });
     }
+  },
+
+  async searchDocuments(searchTerms) {
+    searchTerms = searchTerms.split(/\s+/);
+    searchTerms = searchTerms.filter(term => term !== '');
+    documents = {};
+
+    for (i = 0; i < searchTerms.length; i++) {
+      term = await Term.findOne({ term: searchTerms[i] });
+      if (term) {
+        for (j = 0; j < term.tf.length; j++) {
+          if (documents.hasOwnProperty(term.tf[j][0])) {
+            documents[term.tf[j][0]] += term.tf[j][1] * term.idf;
+          }
+          else {
+            documents[term.tf[j][0]] = term.tf[j][1] * term.idf;
+          }
+        }
+      }
+    }
+    // Ordenando os livros por ordem de relevância (do maior para o menor)
+    documents = Object.keys(documents).map(function (documentId) {
+      return [documentId, documents[documentId]];
+    });
+    documents.sort(function (first, second) {
+      return second[1] - first[1];
+    });
+    return documents;
   }
 };

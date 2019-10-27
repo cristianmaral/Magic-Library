@@ -9,14 +9,21 @@ const preprocessing = require('../utils/preprocessing');
 
 module.exports = {
   async index(req, res) {
-    const { searchTerms } = req.query;
-    const books = await Book.find({});
+    var { searchTerms, category } = req.query;
 
     if (!searchTerms) {
+      const books = category ? await Book.find({ category }) : await Book.find({});
       return res.json(books);
     }
     else {
-      return res.json(books); //tratar relevância
+      searchTerms = preprocessing.runCompletePreprocessing(searchTerms);
+      documents = await tfidf.searchDocuments(searchTerms);
+      books = [];
+      for (i = 0; i < documents.length; i++) {
+        book = await Book.findById(documents[i][0]);
+        books.push(book);
+      }
+      return res.json(books);
     }
   },
 
@@ -62,17 +69,5 @@ module.exports = {
     const documentsCount = await Book.countDocuments();
     await tfidf.calculateTFIDF(book._id, pdfText, documentsCount);
     return res.json(book);
-  },
-
-  async teste(req, res) {
-    var text1 = 'andre bruno cristian andre cristian joaquim joaquim joaquim piranha';
-    var text2 = 'bola gato tutorial safada piranha cristian andre brunequim bruno';
-    var text3 = 'andre bruno brunequim tutorial parceria';
-
-    await tfidf.calculateTFIDF('teste', text1, 1);
-    await tfidf.calculateTFIDF('teste2', text2, 2);
-    await tfidf.calculateTFIDF('teste3', text3, 3);
-    const quantidade = await Term.countDocuments();
-    return res.json({ quantidade: quantidade });
   }
 };

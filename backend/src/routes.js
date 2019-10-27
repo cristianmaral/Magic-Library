@@ -21,7 +21,4 @@ routes.get('/books/:book_id', BookController.show);
 var uploadFields = upload.fields([{ name: 'image', maxCount: 1 }, { name: 'pdf', maxCount: 1 }])
 routes.post('/books', uploadFields, BookController.store);
 
-//Routes de teste
-routes.get('/teste', BookController.teste);
-
 module.exports = routes;
