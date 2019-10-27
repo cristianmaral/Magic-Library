@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { AsyncStorage, Alert, Image, KeyboardAvoidingView, Picker, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { Header } from 'react-navigation-stack';
 import * as DocumentPicker from 'expo-document-picker';
 
 import api from '../services/api';
@@ -68,7 +67,7 @@ export default class pages extends Component {
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'user_id': await AsyncStorage.getItem('user').user_id
+          'user_id': JSON.parse(await AsyncStorage.getItem('user')).id
         }
       };
       const response = await api.post('/books', formData, config);

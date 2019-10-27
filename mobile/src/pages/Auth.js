@@ -13,7 +13,7 @@ export default class Auth extends Component {
         this.props.navigation.navigate('Admin');
       }
       else {
-        this.props.navigation.navigate('BookList');
+        this.props.navigation.navigate('Main');
       }
     }
     else {

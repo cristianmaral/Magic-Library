@@ -6,7 +6,7 @@ import Welcome from './pages/Welcome';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Admin from './pages/Admin';
-import BookList from './pages/BookList';
+import Main from './pages/Main';
 
 const WelcomeStack = createStackNavigator({
   Welcome,
@@ -18,8 +18,8 @@ const AdminStack = createStackNavigator({
   Admin
 });
 
-const BookListStack = createStackNavigator({
-  BookList
+const MainStack = createStackNavigator({
+  Main
 });
 
 const Routes = createAppContainer(
@@ -28,7 +28,7 @@ const Routes = createAppContainer(
       Auth,
       WelcomeStack,
       AdminStack,
-      BookListStack
+      MainStack
     },
     {
       initialRouteName: 'Auth'

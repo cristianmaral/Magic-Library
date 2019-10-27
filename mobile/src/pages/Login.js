@@ -23,7 +23,7 @@ export default class Login extends Component {
   handleLogin = async () => {
     if (this.state.email != '' && this.state.password != '') {
       try {
-        const response = await api.post('/users/login', {
+        const response = await api.post('/login', {
           email: this.state.email,
           password: this.state.password
         });
@@ -33,7 +33,7 @@ export default class Login extends Component {
           this.props.navigation.navigate('Admin');
         }
         else {
-          this.props.navigation.navigate('BookList');
+          this.props.navigation.navigate('Main');
         }
       } catch (error) {
         Alert.alert(
