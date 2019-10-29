@@ -67,7 +67,7 @@ module.exports = {
     pdfText = await pdfParse(pdfFile);
     pdfText = preprocessing.runCompletePreprocessing(pdfText.text);
     const documentsCount = await Book.countDocuments();
-    await tfidf.calculateTFIDF(book._id, pdfText, documentsCount);
+    tfidf.calculateTFIDF(book._id, pdfText, documentsCount);
     return res.json(book);
   }
 };
