@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
 
   form: {
     width: '100%',
-    paddingHorizontal: 20
+    paddingHorizontal: 11
   },
 
   label: {
