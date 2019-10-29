@@ -11,7 +11,11 @@ export default class Login extends Component {
     this.state = {
       email: '',
       password: '',
-      hidePassword: true
+      hidePassword: true,
+      formErrors: {
+        email: false,
+        password: false
+      }
     };
   }
 
@@ -20,12 +24,32 @@ export default class Login extends Component {
     headerTintColor: '#483b78'
   };
 
+  handleInputChange = (inputName, value) => {
+    const { formErrors } = this.state;
+    switch (inputName) {
+      case 'email':
+        emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        formErrors.email = emailRegex.test(value.toLowerCase()) ? false : true;
+        break;
+      case 'password':
+        formErrors.password = value.length >= 6 ? false : true;
+        break;
+    }
+    this.setState({ formErrors, [inputName]: value });
+  }
+
   handleLogin = async () => {
-    if (this.state.email != '' && this.state.password != '') {
+    const { email, password, formErrors } = this.state;
+    if (email == '')
+      formErrors.email = true;
+    if (password == '')
+      formErrors.password = true
+    this.setState({ email, password, formErrors });
+    if (!formErrors.email && !formErrors.password) {
       try {
         const response = await api.post('/login', {
-          email: this.state.email,
-          password: this.state.password
+          email,
+          password
         });
         const { _id, admin } = response.data;
         await AsyncStorage.setItem('user', JSON.stringify({ id: _id, admin }));
@@ -59,28 +83,37 @@ export default class Login extends Component {
             keyboardType='email-address'
             placeholder='Seu e-mail'
             placeholderTextColor='#999'
-            style={styles.input}
+            style={[styles.input, !this.state.formErrors.email ? styles.validInput : styles.errorInput]}
             value={this.state.email}
-            onChangeText={(email) => { this.setState({ email: email }) }}
+            onChangeText={(value) => { this.handleInputChange('email', value) }}
           />
+          {this.state.formErrors.email && (
+            <Text style={styles.errorMessage}>E-mail inválido</Text>
+          )}
 
-          <Text style={styles.label}>SENHA</Text>
-          <TextInput
-            autoCapitalize='none'
-            autoCorrect={false}
-            placeholder='Sua senha'
-            placeholderTextColor='#999'
-            secureTextEntry={this.state.hidePassword}
-            style={styles.input}
-            value={this.state.password}
-            onChangeText={(password) => { this.setState({ password: password }) }}
-          />
-          <Icon style={styles.visibilityToggleButton}
-            color={'#999'}
-            onPress={() => { this.setState({ hidePassword: !this.state.hidePassword }) }}
-            name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
-            size={25}
-          />
+          <View>
+            <Text style={styles.label}>SENHA</Text>
+            <TextInput
+              autoCapitalize='none'
+              autoCorrect={false}
+              placeholder='Sua senha'
+              placeholderTextColor='#999'
+              secureTextEntry={this.state.hidePassword}
+              style={[styles.input, !this.state.formErrors.password ? styles.validInput : styles.errorInput]}
+              value={this.state.password}
+              onChangeText={(value) => { this.handleInputChange('password', value) }}
+            />
+            <Icon style={styles.visibilityToggleButton}
+              color={'#999'}
+              onPress={() => { this.setState({ hidePassword: !this.state.hidePassword }) }}
+              name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
+              size={25}
+            />
+            {this.state.formErrors.password && (
+              <Text style={styles.errorMessage}>Senha inválida (mínimo de 6 caracteres)</Text>
+            )}
+          </View>
+
           <TouchableOpacity style={styles.loginButton} onPress={this.handleLogin}>
             <Text style={styles.loginText}>Login</Text>
           </TouchableOpacity>
@@ -111,7 +144,7 @@ const styles = StyleSheet.create({
 
   form: {
     width: '100%',
-    paddingHorizontal: 25
+    paddingHorizontal: 11
   },
 
   label: {
@@ -122,7 +155,6 @@ const styles = StyleSheet.create({
 
   input: {
     borderWidth: 1,
-    borderColor: '#999',
     paddingHorizontal: 10,
     fontSize: 16,
     color: '#444',
@@ -131,12 +163,26 @@ const styles = StyleSheet.create({
     borderRadius: 4
   },
 
+  validInput: {
+    borderColor: '#999'
+  },
+
+  errorInput: {
+    borderColor: '#FF0000'
+  },
+
+  errorMessage: {
+    color: '#FF0000',
+    fontSize: 12,
+    marginTop: -12,
+    marginBottom: 10
+  },
+
   visibilityToggleButton:
   {
     position: 'absolute',
     right: 0,
-    top: 136,
-    marginRight: 24,
+    top: 40,
     paddingHorizontal: 10,
     zIndex: 1
   },

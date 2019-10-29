@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Text, FlatList, Image, Dimensions, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import api from '../services/api';
 
@@ -20,6 +20,10 @@ export default class BookList extends Component {
     this.setState({ books: books.data });
   }
 
+  handleBookClick = (book) => {
+    this.props.navigation.navigate('Book', { book })
+  };
+
   render() {
     return (
       <View>
@@ -33,7 +37,7 @@ export default class BookList extends Component {
               horizontal
               showsHorizontalScrollIndicator={false}
               renderItem={({ item }) => (
-                <TouchableOpacity style={styles.listItem}>
+                <TouchableOpacity style={styles.listItem} onPress={() => this.handleBookClick(item)}>
                   <Image style={styles.thumbnail} source={{ uri: item.image_url.replace('localhost', '192.168.0.109') }} />
                 </TouchableOpacity>
               )}

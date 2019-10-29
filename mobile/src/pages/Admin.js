@@ -15,7 +15,15 @@ export default class pages extends Component {
       edition: '',
       volume: '',
       image: null,
-      pdf: null
+      pdf: null,
+      formErrors: {
+        title: false,
+        authors: false,
+        edition: false,
+        volume: false,
+        image: false,
+        pdf: false
+      }
     };
   }
 
@@ -29,8 +37,30 @@ export default class pages extends Component {
   };
 
   handleInputChange = (inputName, value) => {
-    this.setState({ [inputName]: value });
-  };
+    const { formErrors } = this.state;
+    switch (inputName) {
+      case 'title':
+        formErrors.title = false;
+        break;
+      case 'authors':
+        authorsRegex = /^\w+(,\s?\w+)*$/;
+        formErrors.authors = authorsRegex.test(value) ? false : true;
+        break;
+      case 'edition':
+        formErrors.edition = false;
+        break;
+      case 'volume':
+        formErrors.volume = false;
+        break;
+      case 'image':
+        formErrors.image = false;
+        break;
+      case 'pdf':
+        formErrors.pdf = false;
+        break;
+    }
+    this.setState({ formErrors, [inputName]: value });
+  }
 
   handleSelectImage = async () => {
     let image = await DocumentPicker.getDocumentAsync({
@@ -55,37 +85,53 @@ export default class pages extends Component {
   };
 
   handleRegisterBook = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('title', this.state.title);
-      formData.append('authors', this.state.authors);
-      formData.append('category', this.state.category);
-      formData.append('edition', this.state.edition);
-      formData.append('volume', this.state.volume);
-      formData.append('image', this.state.image);
-      formData.append('pdf', this.state.pdf);
-      const config = {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'user_id': JSON.parse(await AsyncStorage.getItem('user')).id
-        }
-      };
-      const response = await api.post('/books', formData, config);
-      Alert.alert(
-        'Cadastro realizado com sucesso',
-        response.data.title,
-        [
-          { text: 'OK' }
-        ]
-      );
-    } catch (error) {
-      Alert.alert(
-        'Falha no cadastro',
-        error.response.data.error,
-        [
-          { text: 'OK' }
-        ]
-      );
+    const { title, authors, category, edition, volume, image, pdf, formErrors } = this.state;
+    if (title == '')
+      formErrors.title = true
+    if (authors == '')
+      formErrors.authors = true
+    if (edition == '')
+      formErrors.edition = true
+    if (volume == '')
+      formErrors.volume = true
+    if (image == null)
+      formErrors.image = true
+    if (pdf == null)
+      formErrors.pdf = true
+    this.setState({ formErrors });
+    if (!formErrors.title && !formErrors.authors && !formErrors.edition && !formErrors.volume && !formErrors.image && !formErrors.pdf) {
+      try {
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('authors', authors);
+        formData.append('category', category);
+        formData.append('edition', edition);
+        formData.append('volume', volume);
+        formData.append('image', image);
+        formData.append('pdf', pdf);
+        const config = {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'user_id': JSON.parse(await AsyncStorage.getItem('user')).id
+          }
+        };
+        const response = await api.post('/books', formData, config);
+        Alert.alert(
+          'Cadastro realizado com sucesso',
+          response.data.title,
+          [
+            { text: 'OK' }
+          ]
+        );
+      } catch (error) {
+        Alert.alert(
+          'Falha no cadastro',
+          error.response.data.error,
+          [
+            { text: 'OK' }
+          ]
+        );
+      }
     }
   };
 
@@ -128,10 +174,13 @@ export default class pages extends Component {
             autoCorrect={false}
             placeholder='Título do livro'
             placeholderTextColor='#999'
-            style={[styles.input, styles.validInput]}
+            style={[styles.input, !this.state.formErrors.title ? styles.validInput : styles.errorInput]}
             value={this.state.title}
             onChangeText={(value) => { this.handleInputChange('title', value) }}
           />
+          {this.state.formErrors.title && (
+            <Text style={styles.errorMessage}>Título inválido</Text>
+          )}
 
           <Text style={styles.label}>AUTORES *</Text>
           <TextInput
@@ -139,10 +188,13 @@ export default class pages extends Component {
             autoCorrect={false}
             placeholder='Autores do livro (separados por vírgula)'
             placeholderTextColor='#999'
-            style={[styles.input, styles.validInput]}
+            style={[styles.input, !this.state.formErrors.authors ? styles.validInput : styles.errorInput]}
             value={this.state.authors}
             onChangeText={(value) => { this.handleInputChange('authors', value) }}
           />
+          {this.state.formErrors.authors && (
+            <Text style={styles.errorMessage}>Autores inválidos</Text>
+          )}
 
           <Text style={styles.label}>CATEGORIA *</Text>
           <View style={styles.picker}>
@@ -171,10 +223,13 @@ export default class pages extends Component {
                 placeholder='Edição do livro'
                 keyboardType='numeric'
                 placeholderTextColor='#999'
-                style={[styles.input, styles.validInput]}
+                style={[styles.input, !this.state.formErrors.edition ? styles.validInput : styles.errorInput]}
                 value={this.state.edition}
                 onChangeText={(value) => { this.handleInputChange('edition', value) }}
               />
+              {this.state.formErrors.edition && (
+                <Text style={styles.errorMessage}>Edição inválida</Text>
+              )}
             </View>
             <View style={styles.inputColumn}>
               <Text style={styles.label}>VOLUME *</Text>
@@ -182,15 +237,18 @@ export default class pages extends Component {
                 placeholder='Volume do livro'
                 keyboardType='numeric'
                 placeholderTextColor='#999'
-                style={[styles.input, styles.validInput]}
+                style={[styles.input, !this.state.formErrors.volume ? styles.validInput : styles.errorInput]}
                 value={this.state.volume}
                 onChangeText={(value) => { this.handleInputChange('volume', value) }}
               />
+              {this.state.formErrors.volume && (
+                <Text style={styles.errorMessage}>Volume inválido</Text>
+              )}
             </View>
           </View>
 
           <Text style={styles.label}>PDF *</Text>
-          <View style={[styles.input, styles.validInput, styles.inputRow]}>
+          <View style={[styles.input, !this.state.formErrors.pdf ? styles.validInput : styles.errorInput, styles.inputRow]}>
             <View style={styles.pdfButtonInput}>
               <TouchableOpacity style={styles.pdfButton} onPress={this.handleSelectPdf}>
                 <Text style={styles.pdfButtonText}>Escolher PDF</Text>
@@ -200,6 +258,9 @@ export default class pages extends Component {
               <Text style={styles.pdfText}>{this.state.pdf ? 'PDF inserido com sucesso' : 'Nenhum arquivo selecionado'}</Text>
             </View>
           </View>
+          {this.state.formErrors.pdf && (
+            <Text style={styles.errorMessage}>PDF inválido</Text>
+          )}
 
           <TouchableOpacity style={styles.registerBookButton} onPress={this.handleRegisterBook}>
             <Text style={styles.registerBookText}>Cadastrar Livro</Text>
@@ -273,7 +334,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 10,
     fontSize: 16,
-    color: '#444',
     height: 50,
     marginBottom: 15,
     borderRadius: 4

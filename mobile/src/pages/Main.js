@@ -1,21 +1,13 @@
 import React, { Component } from 'react';
-import { AsyncStorage, Image, FlatList, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-
+import { AsyncStorage, Image, SafeAreaView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+
 import BookList from '../components/BookList';
 
 export default class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      books: [
-        { id: '1', title: 'Projeto de Algoritmos', image: '../assets/livro2.jpg' },
-        { id: '2', title: 'Computação', image: '../assets/livro2.jpg' },
-        { id: '3', title: 'Computação', image: '../assets/livro2.jpg' },
-        { id: '4', title: 'Computação', image: '../assets/livro2.jpg' },
-        { id: '5', title: 'Computação', image: '../assets/livro2.jpg' },
-        { id: '6', title: 'Computação', image: '../assets/livro2.jpg' }
-      ],
       searchTerms: ''
     };
   };
@@ -24,9 +16,16 @@ export default class Main extends Component {
     header: null
   };
 
-  logOut = async () => {
+  handleLogout = async () => {
     await AsyncStorage.clear();
     this.props.navigation.navigate('Welcome');
+  };
+
+  handleSearch = () => {
+    const { searchTerms } = this.state;
+    if (searchTerms != '') {
+      this.props.navigation.navigate('Search', { searchTerms: this.state.searchTerms });
+    }
   };
 
   render() {
@@ -39,7 +38,7 @@ export default class Main extends Component {
             color={'#483b78'}
             name={'user-circle'}
             size={40}
-            onPress={this.logOut}
+            onPress={this.handleLogout}
           />
         </View>
 
@@ -57,23 +56,24 @@ export default class Main extends Component {
               color={'#fff'}
               name={'search'}
               size={25}
+              onPress={this.handleSearch}
             />
           </View>
 
-          <BookList category='Administração' />
-          <BookList category='Agronomia' />
-          <BookList category='Ciência da Computação' />
-          <BookList category='Ciências Biológicas' />
-          <BookList category='Educação Física' />
-          <BookList category='Física' />
-          <BookList category='Gestão Ambiental' />
-          <BookList category='Engenharia de Alimentos' />
-          <BookList category='Química' />
-          <BookList category='Matemática' />
+          <BookList category='Administração' navigation={this.props.navigation} />
+          <BookList category='Agronomia' navigation={this.props.navigation} />
+          <BookList category='Ciência da Computação' navigation={this.props.navigation} />
+          <BookList category='Ciências Biológicas' navigation={this.props.navigation} />
+          <BookList category='Educação Física' navigation={this.props.navigation} />
+          <BookList category='Física' navigation={this.props.navigation} />
+          <BookList category='Gestão Ambiental' navigation={this.props.navigation} />
+          <BookList category='Engenharia de Alimentos' navigation={this.props.navigation} />
+          <BookList category='Química' navigation={this.props.navigation} />
+          <BookList category='Matemática' navigation={this.props.navigation} />
         </ScrollView>
       </SafeAreaView>
     );
-  }
+  };
 }
 
 const styles = StyleSheet.create({
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     marginLeft: 11,
     backgroundColor: '#fff',
     flexDirection: 'row',
-    marginBottom: 10
+    marginBottom: 15
   },
 
   searchBar: {

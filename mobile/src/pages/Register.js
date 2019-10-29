@@ -52,13 +52,22 @@ export default class Register extends Component {
   }
 
   handleRegister = async () => {
-    if (!this.state.formErrors.name && !this.state.formErrors.email && !this.state.formErrors.password && !this.state.formErrors.confirmPassword) {
+    const { name, email, password, confirmPassword, formErrors } = this.state;
+    if (name == '')
+      formErrors.name = true;
+    if (email == '')
+      formErrors.email = true
+    if (password == '')
+      formErrors.password = true
+    if (confirmPassword == '')
+      formErrors.confirmPassword = true
+    if (!formErrors.name && !formErrors.email && !formErrors.password && !formErrors.confirmPassword) {
       try {
         const response = await api.post('/users/register', {
-          name: this.state.name,
-          email: this.state.email,
-          password: this.state.password,
-          receiveNotifications: this.state.receiveNotifications
+          name,
+          email,
+          password,
+          receiveNotifications
         });
         const { _id, admin } = response.data;
         await AsyncStorage.setItem('user', JSON.stringify({ id: _id, admin }));
@@ -73,6 +82,7 @@ export default class Register extends Component {
         );
       }
     }
+    this.setState({ formErrors });
   };
 
   render() {
@@ -90,7 +100,7 @@ export default class Register extends Component {
             value={this.state.name}
             onChangeText={(value) => { this.handleInputChange('name', value) }}
           />
-          {this.state.formErrors.name && this.state.name.length > 0 && (
+          {this.state.formErrors.name && (
             <Text style={styles.errorMessage}>Nome completo inválido</Text>
           )}
 
@@ -105,7 +115,7 @@ export default class Register extends Component {
             value={this.state.email}
             onChangeText={(value) => { this.handleInputChange('email', value) }}
           />
-          {this.state.formErrors.email && this.state.email.length > 0 && (
+          {this.state.formErrors.email && (
             <Text style={styles.errorMessage}>E-mail inválido</Text>
           )}
 
@@ -127,7 +137,7 @@ export default class Register extends Component {
               name={this.state.hidePassword ? 'visibility' : 'visibility-off'}
               size={25}
             />
-            {this.state.formErrors.password && this.state.password.length > 0 && (
+            {this.state.formErrors.password && (
               <Text style={styles.errorMessage}>Senha inválida (mínimo de 6 caracteres)</Text>
             )}
           </View>
@@ -150,7 +160,7 @@ export default class Register extends Component {
               name={this.state.hideConfirmPassword ? 'visibility' : 'visibility-off'}
               size={25}
             />
-            {this.state.formErrors.confirmPassword && this.state.confirmPassword.length > 0 && (
+            {this.state.formErrors.confirmPassword && (
               <Text style={styles.errorMessage}>As senhas não conferem</Text>
             )}
           </View>
@@ -190,7 +200,7 @@ const styles = StyleSheet.create({
 
   form: {
     width: '100%',
-    paddingHorizontal: 25
+    paddingHorizontal: 11
   },
 
   label: {
